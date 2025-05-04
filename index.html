@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Token Manager</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, button { padding: 8px; margin: 5px 0; width: 300px; }
+    ul { list-style-type: none; padding-left: 0; }
+    li { background: #f2f2f2; margin: 5px 0; padding: 8px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Token Manager</h1>
+  <form id="tokenForm">
+    <input type="text" id="tokenInput" placeholder="Enter token" required />
+    <button type="submit">Save Token</button>
+  </form>
+
+  <h2>Saved Tokens:</h2>
+  <ul id="tokenList"></ul>
+
+  <script>
+    const form = document.getElementById('tokenForm');
+    const input = document.getElementById('tokenInput');
+    const list = document.getElementById('tokenList');
+
+    async function loadTokens() {
+      const res = await fetch('/api/tokens');
+      const tokens = await res.json();
+      list.innerHTML = '';
+      tokens.forEach(token => {
+        const li = document.createElement('li');
+        li.textContent = token;
+        list.appendChild(li);
+      });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = input.value;
+      await fetch('/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      input.value = '';
+      loadTokens();
+    });
+
+    loadTokens();
+  </script>
+</body>
+</html>
